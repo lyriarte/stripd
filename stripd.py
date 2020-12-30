@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 from rpi_ws281x import *
+from fastapi import FastAPI
 
     
 # LED strip configuration:
@@ -15,4 +16,15 @@ LED_CHANNEL    = 0       # set to '1' for GPIOs 13, 19, 41, 45 or 53
 # LED strip initialization 
 strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS, LED_CHANNEL)
 strip.begin()
+
+
+# FastAPI app instance
+app = FastAPI()
+
+# stripd API
+@app.get("/STRIPLED/{index}/RGB/{color}")
+def read_stripled_rgb(index: int, color: str):
+	strip.setPixelColor(index, Color(int(color,16) >> 16, (int(color,16) & 0xFF00) >> 8, int(color,16) & 0xFF))
+	strip.show()
+	return {"led": index, "rgb": color}
 
