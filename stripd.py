@@ -28,3 +28,20 @@ def read_stripled_rgb(index: int, color: str):
 	strip.show()
 	return {"led": index, "rgb": color}
 
+@app.get("/GRADIENT/{src}/{srcrgb}/{dst}/{dstrgb}")
+def read_gradient(src: int, srcrgb: str, dst: int, dstrgb: str):
+	srcr = int(srcrgb,16) >> 16
+	srcg = (int(srcrgb,16) & 0xFF00) >> 8
+	srcb = int(srcrgb,16) & 0xFF
+	dstr = int(dstrgb,16) >> 16
+	dstg = (int(dstrgb,16) & 0xFF00) >> 8
+	dstb = int(dstrgb,16) & 0xFF
+	dr = dstr - srcr
+	dg = dstg - srcg
+	db = dstb - srcb
+	for index in range(src, dst):
+		delta = float(dst-index)/(dst-src)
+		strip.setPixelColor(index, Color(min(255,max(0,dstr-int(dr*delta))), min(255,max(0,dstg-int(dg*delta))), min(255,max(0,dstb-int(db*delta)))))
+	strip.show()
+	return {"src": src, "dst": dst, "srcrgb": srcrgb, "dstrgb": dstrgb}
+
